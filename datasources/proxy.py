@@ -1,7 +1,11 @@
 import requests
 import json
 
-
+"""
+--------------------------------------
+This is a test file for playing with proxies - things aren't going too hot
+-------------------------------------
+"""
 class ProxyRotator:
 
     def __init__(self):

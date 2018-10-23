@@ -1,6 +1,6 @@
 import json
-import random
 import time
+from threading import Thread
 
 import keys
 from processing import elasticsearchdb
@@ -50,21 +50,25 @@ class LyricScraper:
         self.records_processed = 0
 
     def run(self):
+        """
+        Main run loop
+
+        :return: None
+        """
         begin = time.time()
         cur_date = self.start_date
 
         while (time.strptime(cur_date, "%Y-%m-%d") > time.strptime(self.stop_date, "%Y-%m-%d")) and \
                 (self.records_processed < self.max_records):
 
+            threads = []
             # Main process for data collection:
             for chart in self.charts:
-                augmented_results = self.get_augmented_chart_list(chart,
-                                                                  cur_date)
-
-                if self.use_es:
-                    self._put_data_in_es(augmented_results)
-                else:
-                    self._log_to_file(augmented_results, chart, cur_date)
+                t = Thread(target=self.get_augmented_chart_list, args=(chart, cur_date), daemon=True)
+                t.start()
+                threads.append(t)
+            for t in threads:
+                t.join()
 
             # All charts are done for this time period. Cleanup:
             self.log_performance(begin)
@@ -100,7 +104,10 @@ class LyricScraper:
         :return: dictionary of chart info
         """
         master_dict = {}
-        chart_dict = self.BB.get_chart(chart_name=chart, date_str=date)
+        try:
+            chart_dict = self.BB.get_chart(chart_name=chart, date_str=date)
+        except:
+            return {}
 
         for key, val in chart_dict.items():
 
@@ -130,6 +137,10 @@ class LyricScraper:
                                          val, self.records_processed))
             self.records_processed += 1
 
+        if self.use_es:
+            self._put_data_in_es(master_dict)
+        else:
+            self._log_to_file(master_dict, chart, date)
         return master_dict
 
     def _put_data_in_es(self, master_dict: dict):
@@ -357,8 +368,23 @@ class LyricScraper:
                   " : " + "Records Processed: " + str(records_processed)
         return ret_str
 
-
 if __name__ == "__main__":
-    LS = LyricScraper(charts=['hot-100'], backtrack=False,
-                      es=False, max_records=5)
+    with open('run.json', 'r') as file:
+        param = json.load(file)
+    print("Running For Parameters:")
+    charts = param["charts"]
+    print("Charts :", charts)
+    start_date = param["start_date"]
+    print("Start Date : ", start_date)
+    end_date = param["end_date"]
+    print("End Date :", end_date)
+    es = param["use_elastic_search"]
+    print("Use ES? :", es)
+    max_entries = param["max_entries"]
+    LS = LyricScraper(charts=charts,
+                      start_date=start_date,
+                      stop_date=end_date,
+                      backtrack=True,
+                      es=es,
+                      max_records=max_entries)
     LS.run()

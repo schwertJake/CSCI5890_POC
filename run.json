@@ -1,0 +1,10 @@
+{
+  "charts": [
+    "rock-songs",
+    "country-songs"
+  ],
+  "start_date": "2018-10-13",
+  "end_date": "2018-01-01",
+  "use_elastic_search": false,
+  "max_entries": 50
+}

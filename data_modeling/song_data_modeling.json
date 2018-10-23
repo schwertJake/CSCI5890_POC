@@ -18,6 +18,7 @@
     ],
 
     "Genius_Lyrics": "str",
+    "Wikia_Lyrics": "str",
 
     "AZ_Lyrics": "str",
     "AZ_Album": "str",

@@ -8,23 +8,13 @@
         "Missed_Writer": "int",
         "Missed_Album_and_Year": "int",
         "Missed_Genre": "int",
-        "Bad_Response_Count": "int",
-        "Bad_Response_Items": [
-            {
-                "artist": "str",
-                "track": "str",
-                "count": "int",
-                "exception": "str"
-            },
-            {
-                "artist": "str",
-                "track": "str",
-                "count": "int",
-                "exception": "str"
-            }
-        ]
+        "Bad_Response_Count": "int"
     },
     "Genius_Usage_Report": {
+        "Song_Not_Found": "int",
+        "Total_Attempts": "int"
+    },
+    "Wikia_Usage_Report": {
         "Song_Not_Found": "int",
         "Total_Attempts": "int"
     },
