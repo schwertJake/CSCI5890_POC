@@ -1,15 +1,16 @@
 import json
 import time
 from threading import Thread
-
+from elasticsearch import Elasticsearch
 import keys
-from processing import elasticsearchdb
-from processing import processing
 from datasources import azlyrics
-from datasources import billboards
 from datasources import genius
 from datasources import spotify
 from datasources import wikia
+from processing import elasticsearchdb
+from processing import processing
+
+from datasources import billboards
 
 
 class LyricScraper:
@@ -59,7 +60,7 @@ class LyricScraper:
         cur_date = self.start_date
 
         while (time.strptime(cur_date, "%Y-%m-%d") > time.strptime(self.stop_date, "%Y-%m-%d")) and \
-                (self.records_processed < self.max_records):
+                (self.max_records != 0 and self.records_processed < self.max_records):
 
             threads = []
             # Main process for data collection:
@@ -112,7 +113,7 @@ class LyricScraper:
         for key, val in chart_dict.items():
 
             # Do we even need to do this?:
-            if self.records_processed >= self.max_records:
+            if self.max_records != 0 and self.records_processed >= self.max_records:
                 break
             status = "No Update"
             if key in ["Billboard_Chart", "Year", "Month", "Day"]:
@@ -381,6 +382,8 @@ if __name__ == "__main__":
     es = param["use_elastic_search"]
     print("Use ES? :", es)
     max_entries = param["max_entries"]
+    time.sleep(20)
+    Elasticsearch()
     LS = LyricScraper(charts=charts,
                       start_date=start_date,
                       stop_date=end_date,

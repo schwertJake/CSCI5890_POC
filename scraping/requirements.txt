@@ -1,0 +1,10 @@
+pip
+beautifulsoup4
+bs4
+elasticsearch
+requests
+setuptools
+urllib3
+billboard.py
+PyLyrics
+nltk

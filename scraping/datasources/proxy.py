@@ -39,17 +39,18 @@ class ProxyRotator2:
         print(request.json())
 
 if __name__ == "__main__":
-    PR = ProxyRotator()
-    print(PR.get_proxy(protocol="http"))
+    #PR = ProxyRotator()
+    #result = PR.get_proxy(protocol="http")
+    #print(result)
 
     proxyDict = {
-        "http": "23.88.106.10",
+        "http": 'http://195.244.36.205:55450'#"http://74.143.193.83:3128",
     }
 
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                                   'AppleWebKit/537.36 (KHTML, like Gecko) '
                                   'Chrome/60.0.3112.113 Safari/537.36'}
 
-    r = requests.get("http://azlyrics.com/lyrics/usher/climax", headers=headers, proxies=proxyDict)
+    r = requests.get("https://google.com", headers=headers, proxies=proxyDict)
     print(r.status_code)
     print(r.json())

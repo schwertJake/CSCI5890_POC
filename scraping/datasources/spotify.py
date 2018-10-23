@@ -1,5 +1,6 @@
-import requests
 import json
+
+import requests
 
 
 class SpotifyScraper:
@@ -133,7 +134,8 @@ class SpotifyScraper:
 
 
 if __name__ == "__main__":
-    import keys
+    from scraping import keys
+
     k = keys.Keys()
     SS = SpotifyScraper(client_id=k.spotify_client_id,
                         client_secret=k.spotify_client_secret)

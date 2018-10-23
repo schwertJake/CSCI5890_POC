@@ -1,7 +1,8 @@
-from bs4 import BeautifulSoup
-import requests
-import string
 import json
+import string
+
+import requests
+from bs4 import BeautifulSoup
 
 
 class GeniusScraper:
@@ -125,7 +126,7 @@ class GeniusScraper:
 
 if __name__ == "__main__":
 
-    import keys
+    from scraping import keys
     import time
     k = keys.Keys()
 
