@@ -60,7 +60,7 @@ class LyricScraper:
         cur_date = self.start_date
 
         while (time.strptime(cur_date, "%Y-%m-%d") > time.strptime(self.stop_date, "%Y-%m-%d")) and \
-                (self.max_records != 0 and self.records_processed < self.max_records):
+                (self.max_records == 0 or self.records_processed < self.max_records):
 
             threads = []
             # Main process for data collection:
