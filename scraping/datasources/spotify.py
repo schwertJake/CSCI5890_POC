@@ -45,15 +45,22 @@ class SpotifyScraper:
 
         :return: dict of form {
             "Spotify_Usage_Report": {
-                "Missed Searches": int
+                "Missed Searches": int,
+                "Total_Attempts": int
             }
         }
         """
-        return {
+        usage = {
             "Spotify_Usage_Report": {
                 "Missed_Searches": self.song_not_found_count,
                 "Total_Attempts": self.total_attempts
-            }}
+            }
+        }
+        return usage
+
+    def clear_usage_stats(self):
+        self.song_not_found_count = 0
+        self.total_attempts = 0
 
     def _search_artist_track(self, song_key: str, artist_key: str) -> dict:
         """

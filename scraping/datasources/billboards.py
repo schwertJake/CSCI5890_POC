@@ -28,10 +28,27 @@ class BillboardScraper:
         return master_dict
 
     def get_usage_report(self):
-        return {"Billboard_Usage_Report": {
-            "Charts_Processed": self.charts_processed,
-            "Entries_Processed": self.entries_processed
-        }}
+        """
+        returns dict of usage of billboards
+
+        :return: dict of form {
+            "Billboard_Usage_Report": {
+                "Charts_Processed": int,
+                "Entries_Processed": int
+            }
+        }
+        """
+        usage = {
+            "Billboard_Usage_Report": {
+                "Charts_Processed": self.charts_processed,
+                "Entries_Processed": self.entries_processed
+            }
+        }
+        return usage
+
+    def clear_usage_stats(self):
+        self.charts_processed = 0
+        self.entries_processed = 0
 
     def _extract_song_info(self, song) -> dict:
         """

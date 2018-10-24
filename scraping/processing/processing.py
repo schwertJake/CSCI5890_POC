@@ -64,7 +64,7 @@ class LyricAnalyst:
         count = self.records_processed
         if count == 0:
             return {}
-        return {
+        usage = {
             "Processing_Usage_Report": {
                 "Total_Records_Processed": count,
                 "Avg_Perc_Agreed": self.perc_agreed_sum / count,
@@ -74,6 +74,15 @@ class LyricAnalyst:
                 "Avg_Analysis_Time_ms": self.elapsed_time_sum / count * 1000.0
             }
         }
+        return usage
+
+    def clear_usage_stats(self):
+        self.perc_agreed_sum = 0.0
+        self.unique_word_count_sum = 0
+        self.total_word_count_sum = 0
+        self.repetition_count_sum = 0.0
+        self.records_processed = 0
+        self.elapsed_time_sum = 0.0
 
     def _bag_of_words_stemmed(self, lyrics: str) -> dict:
         """
@@ -136,6 +145,11 @@ class LyricAnalyst:
         for key, val in raw_union["Unique"].items():
             dif_word_count += raw_union["Unique"][key]["Count"]
 
+
+        r = []
+        for key, val in same_BoW.items():
+            r.append({"Word": key, "Count": val})
+
         perc_agreed = same_word_count / (same_word_count + dif_word_count)
         return {
             "Percent_Agreed": perc_agreed,
@@ -145,7 +159,7 @@ class LyricAnalyst:
                 len(same_BoW.keys()) /
                 sum([val for val in same_BoW.values()]),
             "Lyric_Sources": source_count,
-            "BoW_Shared": same_BoW
+            "BoW_Shared": r
         }
 
     def _BoW_union_stats_single(self, bow_raw: dict,
@@ -167,6 +181,9 @@ class LyricAnalyst:
         }
         """
         bow = bow_raw[list(bow_raw.keys())[0]]
+        r = []
+        for key,val in bow.items():
+            r.append({"Word": key, "Count": val})
         return {
             "Percent_Agreed": 1,
             "Unique_Word_Count": len(bow.keys()),
@@ -174,7 +191,7 @@ class LyricAnalyst:
             "Repetition_Coeff": len(bow.keys()) /
                                 sum([val for val in bow.values()]),
             "Lyric_Sources": source_count,
-            "BoW_Shared": bow
+            "BoW_Shared": r
         }
 
     def _BoW_union_raw(self, bows_raw_list: list) -> dict:

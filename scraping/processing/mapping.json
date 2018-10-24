@@ -1,0 +1,24 @@
+{
+  "mappings": {
+    "entry": {
+          "properties": {
+            "BB_Chart_Discovered": {
+              "type": "object",
+              "properties": {
+                "Date": {
+                  "type": "date",
+                  "format": "yyyy-MM-dd"
+                }
+              }
+            },
+            "BoW_Shared": {
+              "type": "nested",
+              "properties": {
+                "Word":    { "type": "keyword"  },
+                "Count": { "type": "integer"  }
+              }
+            }
+          }
+    }
+  }
+}

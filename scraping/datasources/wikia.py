@@ -30,12 +30,27 @@ class WikiaScraper:
         return {"Wikia_Lyrics": self._string_strip_lyrics(lyrics)}
 
     def get_usage_report(self):
-        return {
+        """
+        Returns dict of usage statistics
+
+        :return: dict of form {
+            "Wikia_Usage_Report": {
+                "Song_Not_Found": int,
+                "Total_Attempts": int
+            }
+        }
+        """
+        usage = {
             "Wikia_Usage_Report": {
                 "Song_Not_Found": self.song_not_found,
                 "Total_Attempts": self.total_attempts
             }
         }
+        return usage
+
+    def clear_usage_stats(self):
+        self.song_not_found = 0
+        self.total_attempts = 0
 
     @staticmethod
     def _string_strip_lyrics(raw_string: str) -> str:

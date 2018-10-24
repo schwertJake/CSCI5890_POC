@@ -75,9 +75,6 @@ class LyricScraper:
             self.log_performance(begin)
             cur_date = self.BB.rewind_one_week(cur_date)
 
-        # We're free! Save final usage stats
-        self.log_performance(begin)
-
     def log_performance(self, begin):
         """
         Log usage report in file or in elasticsearch
@@ -93,6 +90,7 @@ class LyricScraper:
             self._log_to_file(self.get_usage_reports(),
                               "usage",
                               (str(self.records_processed) + "records"))
+        self.clear_usage()
 
     def get_augmented_chart_list(self, chart: str, date: str) -> dict:
         """
@@ -202,27 +200,25 @@ class LyricScraper:
             "BB_Artist": "str",
             "BB_Featuring": "str",
             "BB_Song_Title": "str",
-            "BB_Billboard_Charts": [
-                {
-                    "Chart_Name": "str",
-                    "Peak_Position": int
-                    "Date": "str"
-                }
-            ]
+            "BB_Chart_Discovered": {
+                "Chart_Name": "str",
+                "Peak_Position": int
+                "Date": "str"
+            }
         }
         """
         return{"BB_Artist": val["Artist"],
                "BB_Featuring": val["Featuring"],
                "BB_Song_Title": val["Title"],
-               "BB_Billboard_Charts": [
+               "BB_Chart_Discovered":
                    {
                         "Chart_Name": chart_name,
                         "Peak_Position": val["Peak_Rank"],
-                        "Date": date_arr["Year"]+"-"+
-                                date_arr["Month"]+"-"+
+                        "Date": date_arr["Year"] + '-' +
+                                date_arr["Month"] + '-' +
                                 date_arr["Day"]
-                    }
-                ]
+                   }
+
                }
 
     def _get_az_info(self, artist_name: str, track_title: str,
@@ -327,14 +323,26 @@ class LyricScraper:
 
         :return: dict
         """
-        report_dict = {}
+        report_dict = {"Total_Records": self.records_processed}
         report_dict.update(self.BB.get_usage_report())
         report_dict.update(self.AZ.get_usage_report())
         report_dict.update(self.GS.get_usage_report())
         report_dict.update(self.WS.get_usage_report())
         report_dict.update(self.SS.get_usage_report())
         report_dict.update(self.Proc.get_usage_report())
+        if self.use_es:
+            report_dict.update(self.ES.get_usage_report())
         return report_dict
+
+    def clear_usage(self):
+        self.BB.clear_usage_stats()
+        self.AZ.clear_usage_stats()
+        self.GS.clear_usage_stats()
+        self.WS.clear_usage_stats()
+        self.SS.clear_usage_stats()
+        self.Proc.clear_usage_stats()
+        if self.use_es:
+            self.ES.clear_usage_stats()
 
     @staticmethod
     def _log_to_file(data: dict, chart_name: str, date: str):
@@ -382,8 +390,9 @@ if __name__ == "__main__":
     es = param["use_elastic_search"]
     print("Use ES? :", es)
     max_entries = param["max_entries"]
-    time.sleep(20)
-    Elasticsearch()
+    if es:
+        time.sleep(10)
+        Elasticsearch()
     LS = LyricScraper(charts=charts,
                       start_date=start_date,
                       stop_date=end_date,

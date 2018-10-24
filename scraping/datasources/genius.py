@@ -56,12 +56,17 @@ class GeniusScraper:
             "Total_Attempts": int
         }
         """
-        return {
+        usage = {
             "Genius_Usage_Report": {
                 "Song_Not_Found": self.song_not_found_count,
                 "Total_Attempts": self.total_count
             }
         }
+        return usage
+
+    def clear_usage_stats(self):
+        self.song_not_found_count = 0
+        self.total_count = 0
 
     def _find_song_id(self, artist_name: str, song_title: str) -> str:
         """

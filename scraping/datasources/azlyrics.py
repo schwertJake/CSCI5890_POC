@@ -57,14 +57,23 @@ class AZLyricsScraper:
                 "Bad_Response_Count": int,
                 "Bad_Response_Items": self.bad_response_items
         """
-        return {
+        usage = {
             "AZ_Lyrics_Usage": {
                 "Total_Attempts": self.total_attempts,
                 "Missed_Writer": self.missed_writer,
                 "Missed_Album_and_Year": self.missed_album_year,
                 "Missed_Genre": self.missed_genre,
                 "Bad_Response_Count": self.bad_response_count
-            }}
+            }
+        }
+        return usage
+
+    def clear_usage_stats(self):
+        self.total_attempts = 0
+        self.missed_writer = 0
+        self.missed_album_year = 0
+        self.missed_album_year = 0
+        self.bad_response_count = 0
 
     def _extract_info(self, html_text: str, flatten_lyrics=False) -> dict:
         """
