@@ -17,7 +17,7 @@ class LyricScraper:
 
     def __init__(self, charts, start_date="2018-10-13",
                  stop_date='1958-01-01', backtrack=False,
-                 es=False, max_records=20):
+                 es=False, max_records=20, max_threads=3):
         """
 
         :param charts:
@@ -33,6 +33,15 @@ class LyricScraper:
         self.use_es = es
         self.charts = charts
         self.max_records = max_records
+        self.max_threads = max_threads
+
+        self.chart_partition = []
+        for thread in range(self.max_threads):
+            self.chart_partition.append([])
+        for num in range(len(self.charts)):
+            self.chart_partition[num%self.max_threads].\
+                append(self.charts[num])
+        print("Chart Partitions", self.chart_partition)
 
         api_keys = keys.Keys()
         self.AZ = azlyrics.AZLyricsScraper()
@@ -64,8 +73,8 @@ class LyricScraper:
 
             threads = []
             # Main process for data collection:
-            for chart in self.charts:
-                t = Thread(target=self.get_augmented_chart_list, args=(chart, cur_date), daemon=True)
+            for charts in self.chart_partition:
+                t = Thread(target=self.get_data_load_balanced, args=(charts, cur_date), daemon=True)
                 t.start()
                 threads.append(t)
             for t in threads:
@@ -92,7 +101,20 @@ class LyricScraper:
                               (str(self.records_processed) + "records"))
         self.clear_usage()
 
-    def get_augmented_chart_list(self, chart: str, date: str) -> dict:
+    def get_data_load_balanced(self, chart_list: list, date: str):
+        """
+        Wrapper for get_augemented_chart_list that cycles through a list of
+        charts. This is called by each working thread, and allows a decoupling
+        of number of threads to number of working charts.
+
+        :param chart_list: list of charts to get data from (str)
+        :param date: date of chart to read (str)
+        :return:
+        """
+        for chart in chart_list:
+            self.get_augmented_chart_list(chart=chart, date=date)
+
+    def get_augmented_chart_list(self, chart: str, date: str):
         """
         Takes a list of billboard charts and gets
         all of the artist and track names from them, returns
@@ -140,7 +162,6 @@ class LyricScraper:
             self._put_data_in_es(master_dict)
         else:
             self._log_to_file(master_dict, chart, date)
-        return master_dict
 
     def _put_data_in_es(self, master_dict: dict):
         """
@@ -390,6 +411,9 @@ if __name__ == "__main__":
     es = param["use_elastic_search"]
     print("Use ES? :", es)
     max_entries = param["max_entries"]
+    print("Max Entries :", max_entries)
+    max_threads = param["max_threads"]
+    print("Max Threads :", max_threads)
     if es:
         time.sleep(10)
         Elasticsearch()
@@ -398,5 +422,6 @@ if __name__ == "__main__":
                       stop_date=end_date,
                       backtrack=True,
                       es=es,
-                      max_records=max_entries)
+                      max_records=max_entries,
+                      max_threads=max_threads)
     LS.run()
