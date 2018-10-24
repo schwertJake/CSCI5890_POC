@@ -1,46 +1,47 @@
 {
-  "song title_artist":
-  {
+  "[Artist]_[Title]": {
     "BB_Artist": "str",
     "BB_Featuring": "str",
     "BB_Song_Title": "str",
-    "BB_Billboard_Charts": [
-      {
-        "Chart_Name": "str",
-        "Peak_Position": "int",
-        "Date": "str"
-      },
-      {
-        "Chart_Name": "str",
-        "Peak_Position": "int",
-        "Date": "str"
-      }
-    ],
-
+    "BB_Chart_Discovered": {
+      "Chart_Name": "str",
+      "Peak_Position": "int",
+      "Date": "yyyy-MM-dd"
+    },
     "Genius_Lyrics": "str",
     "Wikia_Lyrics": "str",
-
     "AZ_Lyrics": "str",
     "AZ_Album": "str",
-    "AZ_Written_By": ["str", "str"],
-    "AZ_Year": "str",
+    "AZ_Written_By": [
+      "str",
+      "str"
+    ],
+    "AZ_Year": "int",
     "AZ_Genre": "str",
-
     "Spotify_Artist_ID": "str",
-    "Spotify_Release Date": "str",
+    "Spotify_Release Date": "yyyy-MM-dd",
     "Spotify_Song_Popularity": "int",
-    "Spotify_Genres": ["str", "str"],
-    "Spotify_Artist_Followers": "int"
+    "Spotify_Genres": [
+      "str",
+      "str"
+    ],
+    "Spotify_Artist_Followers": "int",
     "Spotify_Artist_Popularity": "int",
     "Percent_Agreed": "float",
     "Unique_Word_Count": "int",
     "Total_Word_Count": "int",
     "Repetition_Coeff": "float",
     "Lyric_Sources": "int",
-    "BoW_Shared": {
-      "word1": "count",
-      "word2": "count"
-    }
+    "BoW_Shared": [
+      {
+        "Word": "str",
+        "Count": "int"
+      },
+      {
+        "Word": "str",
+        "Count": "int"
+      }
+    ]
   }
 }
 

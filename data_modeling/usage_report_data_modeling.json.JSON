@@ -1,33 +1,38 @@
 {
-    "Billboard_Usage_Report": {
-        "Charts_Processed": "int",
-        "Entries_Processed": "int"
-    },
-    "AZ_Lyrics_Usage": {
-        "Total_Attempts": "int",
-        "Missed_Writer": "int",
-        "Missed_Album_and_Year": "int",
-        "Missed_Genre": "int",
-        "Bad_Response_Count": "int"
-    },
-    "Genius_Usage_Report": {
-        "Song_Not_Found": "int",
-        "Total_Attempts": "int"
-    },
-    "Wikia_Usage_Report": {
-        "Song_Not_Found": "int",
-        "Total_Attempts": "int"
-    },
-    "Spotify_Usage_Report": {
-        "Missed_Searches": "int",
-        "Total_Attempts": "int"
-    },
-    "Processing_Usage_Report": {
-        "Total_Records_Processed": "int",
-        "Avg_Perc_Agreed": "float",
-        "Avg_Unique_Word_Count": "float",
-        "Avg_Total_Word_Count": "float",
-        "Avg_Repetitions_Count": "float",
-        "Avg_Analysis_Time_ms": "float"
-    }
+  "Total_Records": "int",
+  "Billboard_Usage_Report": {
+    "Charts_Processed": "int",
+    "Entries_Processed": "int"
+  },
+  "AZ_Lyrics_Usage": {
+    "Total_Attempts": "int",
+    "Missed_Writer": "int",
+    "Missed_Album_and_Year": "int",
+    "Missed_Genre": "int",
+    "Bad_Response_Count": "int"
+  },
+  "Genius_Usage_Report": {
+    "Song_Not_Found": "int",
+    "Total_Attempts": "int"
+  },
+  "Wikia_Usage_Report": {
+    "Song_Not_Found": "int",
+    "Total_Attempts": "int"
+  },
+  "Spotify_Usage_Report": {
+    "Missed_Searches": "int",
+    "Total_Attempts": "int"
+  },
+  "Processing_Usage_Report": {
+    "Total_Records_Processed": "int",
+    "Avg_Perc_Agreed": "float",
+    "Avg_Unique_Word_Count": "float",
+    "Avg_Total_Word_Count": "float",
+    "Avg_Repetitions_Count": "float",
+    "Avg_Analysis_Time_ms": "float"
+  },
+  "ES_Usage_Report": {
+    "Total_Posts": "int",
+    "Song_Already_Found": "int"
+  }
 }
