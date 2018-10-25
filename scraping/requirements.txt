@@ -8,3 +8,4 @@ urllib3
 billboard.py
 PyLyrics
 nltk
+pymusixmatch
