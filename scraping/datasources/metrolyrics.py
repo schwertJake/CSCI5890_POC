@@ -11,7 +11,7 @@ class MetroLyrics:
         self.total_count = 0
 
     def get_song_data(self, artist_name: str, track_title: str,
-                      flatten_lyrics: bool):
+                      flatten_lyrics=False) -> dict:
         """
         Public method for getting lyrics from MetroLyrics. Takes the
         name of an artist and track, and returns the lyrics as a long string.

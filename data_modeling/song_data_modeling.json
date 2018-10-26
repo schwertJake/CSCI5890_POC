@@ -8,9 +8,6 @@
       "Peak_Position": "int",
       "Date": "yyyy-MM-dd"
     },
-    "Genius_Lyrics": "str",
-    "Wikia_Lyrics": "str",
-    "AZ_Lyrics": "str",
     "AZ_Album": "str",
     "AZ_Written_By": [
       "str",
@@ -18,15 +15,23 @@
     ],
     "AZ_Year": "int",
     "AZ_Genre": "str",
+    "Genius_Lyrics": "str",
+    "Wikia_Lyrics": "str",
+    "AZ_Lyrics": "str",
     "Spotify_Artist_ID": "str",
-    "Spotify_Release Date": "yyyy-MM-dd",
+    "Spotify_Artist_URI": "str",
+    "Release Date": "yyyy-MM-dd",
     "Spotify_Song_Popularity": "int",
-    "Spotify_Genres": [
-      "str",
-      "str"
-    ],
+     "Genres": {
+      "Names": [
+        "atr",
+        "str"
+      ],
+      "Source": "str"
+    },
     "Spotify_Artist_Followers": "int",
     "Spotify_Artist_Popularity": "int",
+    "Album_Name": "str",
     "Percent_Agreed": "float",
     "Unique_Word_Count": "int",
     "Total_Word_Count": "int",

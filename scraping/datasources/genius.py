@@ -1,8 +1,7 @@
+from bs4 import BeautifulSoup
 import json
 import string
-
 import requests
-from bs4 import BeautifulSoup
 
 
 class GeniusScraper:
@@ -19,7 +18,7 @@ class GeniusScraper:
         self.token = token
         self.headers = {'Authorization': 'Bearer ' + self.token}
 
-    def get_song_data(self, artist_name: str, song_title: str,
+    def get_song_data(self, artist_name: str, track_title: str,
                       flatten_lyrics=False) -> dict:
         """
         Public method for getting lyrics from Genius. Takes the
@@ -28,15 +27,15 @@ class GeniusScraper:
         boolean argument flatter
 
         :param artist_name: name of artist (str)
-        :param song_title: name of song title (str)
+        :param track_title: name of song title (str)
         :param flatten_lyrics: boolean option as described above
         :return: dict of lyrics or empty string if no lyrics found
         """
         self.total_count += 1
         song_id = self._find_song_id(artist_name=artist_name,
-                                     song_title=song_title)
+                                     song_title=track_title)
         if song_id is "":
-            return {"lyrics": ""}
+            return {"Genius_Lyrics": ""}
 
         html_path = self._get_html_path_from_song_id(song_api_path=song_id)
         lyrics = self._get_lyrics_from_html_path(html_path=html_path)
@@ -44,7 +43,7 @@ class GeniusScraper:
         if flatten_lyrics:
             lyrics = self._string_strip_lyrics(" ".join(lyrics.split()))
 
-        return {"lyrics": lyrics}
+        return {"Genius_Lyrics": lyrics}
 
     def get_usage_report(self):
         """

@@ -1,14 +1,11 @@
 {
   "charts": [
     "rock-songs",
-    "country-songs",
-    "hot-100",
-    "r-b-hip-hop-songs",
-    "radio-songs"
+    "country-songs"
   ],
   "start_date": "2018-10-13",
   "end_date": "2018-08-30",
-  "use_elastic_search": false,
-  "max_entries": 50,
+  "use_elastic_search": true,
+  "max_entries": 0,
   "max_threads": 3
 }

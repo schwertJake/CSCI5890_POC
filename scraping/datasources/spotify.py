@@ -16,7 +16,8 @@ class SpotifyScraper:
         self.total_attempts = 0         # count of all attempts to find songs
         self.token = self._get_token(client_id, client_secret)
 
-    def get_song_data(self, artist_name: str, song_title: str) -> dict:
+    def get_song_data(self, artist_name: str, track_title: str,
+                      flatten_lyrics=True) -> dict:
         """
         Top level method to get song data from spotify api
 
@@ -33,10 +34,12 @@ class SpotifyScraper:
         }
         """
         self.total_attempts += 1
-        song_data = self._search_artist_track(song_key=song_title,
+        song_data = self._search_artist_track(song_key=track_title,
                                               artist_key=artist_name)
         if song_data != {}:
-            song_data.update(self._get_artist_info(song_data["Main_Artist_ID"]))
+            song_data.update(self._get_artist_info(song_data["Spotify_Artist_ID"]))
+        else:
+            song_data = {"Spotify_Artist_ID": ""}
         return song_data
 
     def get_usage_report(self) -> dict:
@@ -93,10 +96,10 @@ class SpotifyScraper:
             track = item["name"]
             if artist[0].lower() == artist_key.lower():
                 return{
-                    "Main_Artist_ID": item["album"]["artists"][0]["id"],
-                    "Artist_URI": item["album"]["artists"][0]["uri"],
+                    "Spotify_Artist_ID": item["album"]["artists"][0]["id"],
+                    "Spotify_Artist_URI": item["album"]["artists"][0]["uri"],
                     "Release_Date": item["album"]["release_date"],
-                    "Song_Popularity": item["popularity"]
+                    "Spotify_Song_Popularity": item["popularity"]
                 }
         self.song_not_found_count += 1
         return {}
@@ -117,9 +120,12 @@ class SpotifyScraper:
         response = requests.get(artist_url, params={'access_token': self.token})
         artist_info = response.json()
         return {
-            "Genres": artist_info["genres"],
-            "Artist_Followers": artist_info["followers"]["total"],
-            "Artist_Popularity": artist_info["popularity"]
+            "Genres": {
+                "Names": artist_info["genres"],
+                "Source": "Spotify"
+            },
+            "Spotify_Artist_Followers": artist_info["followers"]["total"],
+            "Spotify_Artist_Popularity": artist_info["popularity"]
         }
 
     @staticmethod
@@ -147,7 +153,7 @@ if __name__ == "__main__":
     SS = SpotifyScraper(client_id=k.spotify_client_id,
                         client_secret=k.spotify_client_secret)
 
-    result = SS.get_song_data(song_title="I Like It", artist_name="Cardi B")
+    result = SS.get_song_data(track_title="I Like It", artist_name="Cardi B")
 
     json_dump = json.dumps(result, indent=4)
     print(json_dump)

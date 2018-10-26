@@ -19,7 +19,7 @@ class MusiXMatchAPI:
         :param artist_name: name of track artist (str)
         :param track_title: name of track title (str)
         :return: dict of form {
-            "Album_name": str,
+            "Album_Name": str,
             "Release_date": "yyyy-MM-dd,
             "Genres": list of strs
         }
@@ -37,10 +37,13 @@ class MusiXMatchAPI:
 
         result = result["body"]["track"]
         return {
-            "Album_name": result["album_name"],
-            "Release_date": result["first_release_date"].split("T")[0],
-            "Genres": [x["music_genre"]["music_genre_name"] for x
-                       in result["primary_genres"]["music_genre_list"]]
+            "Album_Name": result["album_name"],
+            "Release_Date": result["first_release_date"].split("T")[0],
+            "Genres": {
+                "Names": [x["music_genre"]["music_genre_name"] for x
+                       in result["primary_genres"]["music_genre_list"]],
+                "Source": "MusixMatch"
+            }
         }
 
     def get_usage_report(self) -> dict:

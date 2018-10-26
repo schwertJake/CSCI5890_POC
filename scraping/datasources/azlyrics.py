@@ -8,7 +8,6 @@ class AZLyricsScraper:
 
     def __init__(self):
         self.bad_response_count = 0     # Number of bad/null/404 responses from azlyrics
-        self.bad_response_items = []    # list of artist/track pairs and exceptions to cause bad response
         self.missed_genre = 0           # Number of items that couldn't find genres
         self.missed_album_year = 0      # Number of items that couldn't find album and year
         self.missed_writer = 0          # Number of items that couldn't find writers
@@ -34,12 +33,12 @@ class AZLyricsScraper:
         self.total_attempts += 1
         try:
             response = self._get_html(url)
-        except Exception as e:
-            self._bad_response_tracker(artist_name, track_title, str(e))
-            return {}
+        except:
+            self.bad_response_count += 1
+            return {"AZ_Lyrics": ""}
         if response is "":
-            self._bad_response_tracker(artist_name, track_title)
-            return {}
+            self.bad_response_count += 1
+            return {"AZ_Lyrics": ""}
         return self._extract_info(html_text=response,
                                   flatten_lyrics=flatten_lyrics)
 
@@ -50,12 +49,13 @@ class AZLyricsScraper:
 
         :return: dict of form {
         "AZ_Lyrics_Usage": {
-                "Total_Attempts": int,
-                "Missed_Writer": int,
-                "Missed_Album_and_Year": int,
-                "Missed_Genre": int,
-                "Bad_Response_Count": int,
-                "Bad_Response_Items": self.bad_response_items
+            "Total_Attempts": int,
+            "Missed_Writer": int,
+            "Missed_Album_and_Year": int,
+            "Missed_Genre": int,
+            "Bad_Response_Count": int,
+            "Bad_Response_Items": self.bad_response_items
+        }
         """
         usage = {
             "AZ_Lyrics_Usage": {
@@ -92,7 +92,8 @@ class AZLyricsScraper:
                 {"first_name": str, "last_name": str}],
              "album": str,
              "year": int,
-             "genre": str
+             "Genres": str,
+             "Source": "str",
             }
         """
         soup = BeautifulSoup(html_text, 'html.parser')
@@ -100,7 +101,6 @@ class AZLyricsScraper:
         data_dict = self._get_lyrics(soup, flatten_lyrics)
         data_dict.update(self._get_writers(soup))
         data_dict.update(self._get_album_and_year(soup))
-        data_dict.update(self._get_genre(soup))
 
         return data_dict
 
@@ -117,31 +117,7 @@ class AZLyricsScraper:
             lyrics = self._string_strip_lyrics(" ".join(lyrics[0].split()))
         else:
             lyrics = " ".join(lyrics)
-        return {"lyrics": lyrics}
-
-    def _build_url(self, artist_name: str, song_title: str):
-        """
-        Builds url to access azlyrics for given artist's song
-
-        :param artist_name: Name of artist
-        :param song_title: Name of song
-        :return: url path as string
-        """
-        return 'http://azlyrics.com/lyrics/' +\
-            self._strip_string_url(artist_name) + '/' +\
-            self._strip_string_url(song_title) + '.html'
-
-    def _bad_response_tracker(self, artist, track, e="None"):
-        """
-        Tracks bad responses (when AZ lyrics doesn't have
-        lyrics or there are otherwise issues in getting the html
-        response.
-
-        :param artist: name of artist (str)
-        :param track: name of track (str)
-        :return: None
-        """
-        self.bad_response_count += 1
+        return {"AZ_Lyrics": lyrics}
 
     def _get_writers(self, soup) -> dict:
         """
@@ -159,9 +135,9 @@ class AZLyricsScraper:
             if "Writer(s):" in div_small.getText():
                 writers = div_small.getText()
                 writers = writers.replace("Writer(s): ", "").split(", ")
-                return {"written by": writers}
+                return {"AZ_Written_By": writers}
         self.missed_writer += 1
-        return {"written by": ""}
+        return {"AZ_Written_By": ""}
 
     def _get_album_and_year(self, soup) -> dict:
         """
@@ -175,28 +151,11 @@ class AZLyricsScraper:
                 getText().strip().split('\n')[0]
         except Exception as e:
             self.missed_album_year += 1
-            return {"album": "",
-                    "year": ""}
+            return {"AZ_Album": "",
+                    "AZ_Year": ""}
         album_year_list = album_year_raw.replace("\"", "").split(" ")
-        return {"album": " ".join(album_year_list[1:-1]),
-                "year": int(album_year_list[-1][1:-1])}
-
-    def _get_genre(self, soup) -> dict:
-        """
-        Takes a soup object and extracts the genre that AZ lyrics stores
-        internally for that track. If a genre isn't found it will return a
-        blank string
-
-        :param soup: soup object of webpage
-        :return: dict of form {"genre": str}
-        """
-        all_scripts = [x.getText() for x in soup.find_all("script")]
-        for text in all_scripts:
-            if "cf_page" in text:
-                genre = text.split(";")[2].replace("cf_page_genre = \"", "")[:-1]
-                return {"genre": genre.strip()}
-        self.missed_genre += 1
-        return {"genre": ""}
+        return {"AZ_Album": " ".join(album_year_list[1:-1]),
+                "AZ_Year": int(album_year_list[-1][1:-1])}
 
     def _get_html(self, url: str) -> str:
         """
@@ -210,6 +169,18 @@ class AZLyricsScraper:
         if r.status_code != 200:
             return ""
         return r.text
+
+    def _build_url(self, artist_name: str, song_title: str):
+        """
+        Builds url to access azlyrics for given artist's song
+
+        :param artist_name: Name of artist
+        :param song_title: Name of song
+        :return: url path as string
+        """
+        return 'http://azlyrics.com/lyrics/' +\
+            self._strip_string_url(artist_name) + '/' +\
+            self._strip_string_url(song_title) + '.html'
 
     @staticmethod
     def _strip_string_url(raw_string: str) -> str:

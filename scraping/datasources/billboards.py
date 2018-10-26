@@ -20,11 +20,16 @@ class BillboardScraper:
         :return: dictionary of songs in chart
         """
         self.charts_processed += 1
-        master_dict = {'Billboard_Chart': chart_name}
-        master_dict.update(self._parse_date(date_str))
-        chart = billboard.ChartData(name=chart_name, date=date_str)
+        master_dict = {}
+        try:
+            chart = billboard.ChartData(name=chart_name, date=date_str)
+        except billboard.BillboardParseException:
+            return {"Error": "Parse"}
+        except billboard.BillboardNotFoundException:
+            return {"Error": "NotFound"}
         for song in chart:
-            master_dict.update(self._extract_song_info(song))
+            master_dict.update(
+                self._extract_song_info(song, chart_name, date_str))
         return master_dict
 
     def get_usage_report(self):
@@ -50,7 +55,8 @@ class BillboardScraper:
         self.charts_processed = 0
         self.entries_processed = 0
 
-    def _extract_song_info(self, song) -> dict:
+    def _extract_song_info(self, song, chart: str,
+                           date: str) -> dict:
         """
         Takes a song item and returns a dictionary
         of the characteristics of that song, looking like:
@@ -70,10 +76,14 @@ class BillboardScraper:
                 break
         return {
             song.rank: {
-                "Artist": artist,
-                "Featuring": feature,
-                "Title": song.title,
-                "Peak_Rank": int(song.peakPos)
+                "BB_Artist": artist,
+                "BB_Featuring": feature,
+                "BB_Song_Title": song.title,
+                "BB_Chart_Discovered": {
+                    "Chart_Name": chart,
+                    "Peak_Position": int(song.peakPos),
+                    "Date": date
+                }
             }
         }
 
@@ -95,20 +105,6 @@ class BillboardScraper:
         new_date = current_date - datetime.timedelta(days=7)
 
         return new_date.strftime("%Y-%m-%d")
-
-    @staticmethod
-    def _parse_date(date_str: str) -> dict:
-        """
-        Parses a date string in YYYY-MM-DD format
-        into a dict of {"Year": int, "Month": int, "Day": int}
-
-        :param date_str: date  string to parse
-        :return: dict as described above
-        """
-        date_arr = date_str.split("-")
-        return {"Year": int(date_arr[0]),
-                "Month": int(date_arr[1]),
-                "Day": int(date_arr[2])}
 
 
 if __name__ == "__main__":

@@ -39,9 +39,9 @@ class ProxyRotator2:
         print(request.json())
 
 if __name__ == "__main__":
-    #PR = ProxyRotator()
-    #result = PR.get_proxy(protocol="http")
-    #print(result)
+    PR = ProxyRotator()
+    result = PR.get_proxy(protocol="http")
+    print(result)
 
     proxyDict = {
         "http": 'http://195.244.36.205:55450'#"http://74.143.193.83:3128",

@@ -19,7 +19,15 @@
     "Song_Not_Found": "int",
     "Total_Attempts": "int"
   },
+  "MetroLyrics_Usage_Report": {
+    "Song_Not_Found": "int",
+    "Total_Attempts": "int"
+  },
   "Spotify_Usage_Report": {
+    "Missed_Searches": "int",
+    "Total_Attempts": "int"
+  },
+  "Musixmatch_Usage_Reports": {
     "Missed_Searches": "int",
     "Total_Attempts": "int"
   },

@@ -9,13 +9,13 @@ class WikiaScraper:
         self.song_not_found = 0
         self.total_attempts = 0
 
-    def get_lyrics(self, artist_name: str, song_title: str,
+    def get_song_data(self, artist_name: str, track_title: str,
                    flatten_lyrics=False) -> dict:
         """
         Gets lyrics for a given song
 
         :param artist_name: name of artist (str)
-        :param song_title: name of song title (str)
+        :param track_title: name of song title (str)
         :param flatten_lyrics: boolean option to flatten lyrics
         :return: dict of form {
             "Wikia_Lyrics": "str"
@@ -23,7 +23,7 @@ class WikiaScraper:
         """
         self.total_attempts += 1
         try:
-            lyrics = PyLyrics.getLyrics(artist_name, song_title)
+            lyrics = PyLyrics.getLyrics(artist_name, track_title)
         except ValueError:
             self.song_not_found += 1
             lyrics = ""
@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
     for key, val in songs.items():
         print("Artist:", key, " : ", "Track:", val)
-        info = WS.get_lyrics(key, val, flatten_lyrics=True)
+        info = WS.get_song_data(key, val, flatten_lyrics=True)
         json_dump = json.dumps(info, indent=4)
         print(json_dump)
         print()
