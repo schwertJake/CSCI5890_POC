@@ -1,0 +1,260 @@
+GET _search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+GET twitter/_doc/0?_source_include=*.id&_source_exclude=entities
+
+PUT test/_doc/1
+{
+    "counter" : 1,
+    "tags" : ["red"]
+}
+
+POST test/_doc/1/_update
+{
+    "script" : {
+        "source": "ctx._source.counter += params.count",
+        "lang": "painless",
+        "params" : {
+            "count" : 4
+        }
+    }
+}
+
+GET test/_doc/1
+
+POST test/_doc/1/_update
+{
+    "script" : {
+        "source": "ctx._source.tags.add(params.tag)",
+        "lang": "painless",
+        "params" : {
+            "tag" : "blue"
+        }
+    }
+}
+
+POST test/_doc/1/_update
+{
+    "script" : {
+        "source": "if (ctx._source.tags.contains(params.tag)) { ctx.op = 'delete' } else { ctx.op = 'none' }",
+        "lang": "painless",
+        "params" : {
+            "tag" : "green"
+        }
+    }
+}
+GET /test/_doc/_mget
+{
+    "ids" : ["1", "2"]
+}
+GET /_mget
+{
+    "docs" : [
+        {
+            "_index" : "test",
+            "_type" : "_doc",
+            "_id" : "1",
+            "_source" : {
+                "include": ["counter"],
+                "exclude": ["tags"]
+             }
+        },
+        {
+            "_index" : "test",
+            "_type" : "_doc",
+            "_id" : "2"
+        }
+    ]
+}
+
+POST test/_delete_by_query
+{
+  "query": { 
+    "match": {
+      "counter": 5
+    }
+  }
+}
+
+POST test/_update_by_query
+{
+  "script": {
+    "source": "ctx._source.likes++",
+    "lang": "painless"
+  },
+  "query": {
+    "term": {
+      "user": "kimchy"
+    }
+  }
+}
+
+POST _reindex
+{
+  "source": {
+    "index": "test"
+  },
+  "dest": {
+    "index": "new_twitter"
+  }
+}
+#addng documents to index without replacement
+POST _reindex
+{
+  "source": {
+    "index": "twitter"
+  },
+  "dest": {
+    "index": "new_twitter",
+    "op_type": "create"
+  }
+}
+# specify documents to copy to index
+POST _reindex
+{
+  "source": {
+    "index": "twitter",
+    "type": "_doc",
+    "query": {
+      "term": {
+        "user": "kimchy"
+      }
+    }
+  },
+  "dest": {
+    "index": "new_twitter"
+  }
+}
+
+GET /_search
+{
+    "query": {
+        "match" : {
+            "year" : "2012"
+        }
+    }
+}
+## how to search for fields with synonyms and excluding unnecassary fields
+GET /_search
+{
+  "_source": {
+        "excludes": [ "entries" ]
+    },
+   "query": {
+       "match" : {
+           "category": {
+               "query" : "hot",
+               "auto_generate_synonyms_phrase_query" : true
+           }
+       }
+   }
+}
+## how to increase relevance of terms
+GET _search
+{
+    "_source": {
+        "excludes": [ "entries" ]
+    },
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "term": {
+            "year": {
+              "value": "2012",
+              "boost": 2.0 
+            }
+          }
+        },
+        {
+          "term": {
+            "year": "2010" 
+          }
+        }
+      ]
+    }
+  }
+}
+## range queries
+GET _search
+{
+    "_source": {
+        "excludes": [ "entries" ]
+    },
+    "query": {
+        "range" : {
+            "year" : {
+                "gte" : 2000,
+                "lte" : 2009,
+                "format": "dd/MM/yyyy||yyyy",
+                "boost" : 7.0
+            }
+        }
+    }
+}
+## find categories that that have "hot" in their name, that are preferebly in 2012 but can be in 2010,
+## in the months between september and november
+## on the first day of the month
+GET _search
+{
+  "_source": {
+        "excludes": [ "entries" ]
+    },
+  "query": {
+    "bool" : {
+      "must" : {
+        "term" : { "day" : "01" }
+      },
+      "filter": {
+        "match" : {
+           "category": {
+               "query" : "hot",
+               "auto_generate_synonyms_phrase_query" : true
+           }
+       }
+      },
+      "must_not" : {
+        "range" : {
+          "month" : { "gte" : 9, "lte" : 11 }
+        }
+      },
+      "should": [
+        {
+          "term": {
+            "year": {
+              "value": "2012",
+              "boost": 2.0 
+            }
+          }
+        },
+        {
+          "term": {
+            "year": "2010" 
+          }
+        }
+      ],
+      "minimum_should_match" : 1,
+      "boost" : 1.0
+    }
+  }
+}
+## how to include multiple constraints
+GET /_search
+{
+  "query": { 
+    "bool": { 
+      "must": [
+        { "match": { "title":   "Search"        }}, 
+        { "match": { "content": "Elasticsearch" }}  
+      ],
+      "filter": [ 
+        { "term":  { "status": "published" }}, 
+        { "range": { "publish_date": { "gte": "2015-01-01" }}} 
+      ]
+    }
+  }
+}
