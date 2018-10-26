@@ -1,7 +1,7 @@
 import json
 import time
 from nltk.stem import PorterStemmer
-
+import nltk
 
 class LyricAnalyst:
 
@@ -15,6 +15,8 @@ class LyricAnalyst:
         self.records_processed = 0
         self.elapsed_time_sum = 0.0
 
+        nltk.download('punkt')
+        nltk.download('averaged_perceptron_tagger')
         self.ps = PorterStemmer()   # Word Stemmer
         self.union_dict = {}        # Dict for lyric BoW Unions
 
@@ -148,7 +150,11 @@ class LyricAnalyst:
 
         r = []
         for key, val in same_BoW.items():
-            r.append({"Word": key, "Count": val})
+            r.append({
+                "Word": key,
+                "Count": val,
+                "POS_Type": nltk.pos_tag([key])[0][1]
+            })
 
         perc_agreed = same_word_count / (same_word_count + dif_word_count)
         return {
@@ -183,7 +189,11 @@ class LyricAnalyst:
         bow = bow_raw[list(bow_raw.keys())[0]]
         r = []
         for key,val in bow.items():
-            r.append({"Word": key, "Count": val})
+            r.append({
+                "Word": key,
+                "Count": val,
+                "POS_Type": nltk.pos_tag([key])[0][1]
+            })
         return {
             "Percent_Agreed": 1,
             "Unique_Word_Count": len(bow.keys()),

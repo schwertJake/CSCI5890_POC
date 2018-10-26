@@ -37,6 +37,7 @@ class LyricScraper:
         self.max_records = max_records
         self.max_threads = max_threads
         self.records_processed = 0
+        self.unique_songs  = 0
 
         self.chart_partition = []
         for thread in range(self.max_threads):
@@ -155,6 +156,7 @@ class LyricScraper:
 
                 song_dict = self._get_song_data(val, True)
                 status = "New Entry"
+                self.unique_songs += 1
                 master_dict[master_key] = song_dict
 
             # Finished Message so we know there's progress
@@ -194,7 +196,7 @@ class LyricScraper:
             song_dict.update(data.get_song_data(artist_name=artist_name,
                                                 track_title=track_title,
                                                 flatten_lyrics=flatten_lyrics))
-        if song_dict["Spotify_Artist_ID"] == "":
+        if song_dict["Spotify_Artist_ID"] == "Not Found":
             song_dict.update(
                 self.MM.get_song_data(artist_name, track_title)
             )
@@ -215,7 +217,8 @@ class LyricScraper:
 
         :return: dict
         """
-        report_dict = {"Total_Records": self.records_processed}
+        report_dict = {"Total_Records": self.records_processed,
+                       "Unique_Entries": self.unique_songs}
         report_dict.update(self.BB.get_usage_report())
         for data in self.data_sources:
             report_dict.update(data.get_usage_report())
@@ -287,7 +290,7 @@ if __name__ == "__main__":
     print("Max Threads :", max_threads)
 
     if es:
-        time.sleep(10)
+        time.sleep(20)
         Elasticsearch()
 
     LS = LyricScraper(charts=charts,

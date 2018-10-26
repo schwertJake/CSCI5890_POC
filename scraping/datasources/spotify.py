@@ -39,7 +39,7 @@ class SpotifyScraper:
         if song_data != {}:
             song_data.update(self._get_artist_info(song_data["Spotify_Artist_ID"]))
         else:
-            song_data = {"Spotify_Artist_ID": ""}
+            song_data = {"Spotify_Artist_ID": "Not Found"}
         return song_data
 
     def get_usage_report(self) -> dict:
@@ -93,7 +93,6 @@ class SpotifyScraper:
 
         for item in tracks:
             artist = [x["name"] for x in item["artists"]]
-            track = item["name"]
             if artist[0].lower() == artist_key.lower():
                 return{
                     "Spotify_Artist_ID": item["album"]["artists"][0]["id"],

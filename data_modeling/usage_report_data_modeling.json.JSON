@@ -1,5 +1,6 @@
 {
   "Total_Records": "int",
+  "Unique_Entries": "int",
   "Billboard_Usage_Report": {
     "Charts_Processed": "int",
     "Entries_Processed": "int"

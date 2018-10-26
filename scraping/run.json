@@ -4,8 +4,8 @@
     "country-songs"
   ],
   "start_date": "2018-10-13",
-  "end_date": "2018-08-30",
+  "end_date": "2018-01-01",
   "use_elastic_search": true,
-  "max_entries": 0,
-  "max_threads": 3
+  "max_entries": 150,
+  "max_threads": 2
 }

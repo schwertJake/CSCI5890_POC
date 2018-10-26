@@ -15,7 +15,8 @@
               "type": "nested",
               "properties": {
                 "Word":    { "type": "keyword"  },
-                "Count": { "type": "integer"  }
+                "Count": { "type": "integer"  },
+                "POS_Type": { "type": "keyword"  }
               }
             }
           }

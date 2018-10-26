@@ -66,8 +66,8 @@ class MusiXMatchAPI:
         return usage
 
     def clear_usage_stats(self):
-        self.song_not_found_count = 0
-        self.total_attempts = 0
+        self.track_not_found = 0
+        self.total_count = 0
 
 
 if __name__ == "__main__":
