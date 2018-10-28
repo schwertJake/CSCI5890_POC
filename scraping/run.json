@@ -1,11 +1,29 @@
 {
   "charts": [
     "rock-songs",
-    "country-songs"
+    "country-songs",
+    "hot-100",
+    "radio-songs",
+    "digital-song-sales",
+    "streaming-songs",
+    "christian-songs",
+    "gospel-songs",
+    "dance-electronic-songs",
+    "dance-club-play-songs",
+    "latin-songs",
+    "latin-pop-songs",
+    "pop-songs",
+    "adult-pop-songs",
+    "r-b-hip-hop-songs",
+    "r-and-b-songs",
+    "rap-song",
+    "hot-adult-r-and-b-airplay",
+    "alternative-songs",
+    "hot-mainstream-rock-tracks"
   ],
   "start_date": "2018-10-13",
-  "end_date": "2018-01-01",
+  "end_date": "1958-01-01",
   "use_elastic_search": true,
-  "max_entries": 150,
-  "max_threads": 2
+  "max_entries": 0,
+  "max_threads": 5
 }

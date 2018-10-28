@@ -47,6 +47,12 @@ class LyricScraper:
                 append(self.charts[num])
 
         api_keys = keys.Keys()
+        self.SS = spotify.SpotifyScraper(
+            client_id=[api_keys.spotify_client_id,
+                       api_keys.spotify_client_id2],
+            client_secret=[api_keys.spotify_client_secret,
+                           api_keys.spotify_client_secret2]
+        )
         self.data_sources = [
             azlyrics.AZLyricsScraper(),
             genius.GeniusScraper(
@@ -54,10 +60,7 @@ class LyricScraper:
             ),
             wikia.WikiaScraper(),
             metrolyrics.MetroLyrics(),
-            spotify.SpotifyScraper(
-                client_id=api_keys.spotify_client_id,
-                client_secret=api_keys.spotify_client_secret
-            )
+            self.SS
         ]
         self.BB = billboards.BillboardScraper()
         self.MM = musixmatchapi.MusiXMatchAPI(key=api_keys.musixmatch_key)
@@ -132,6 +135,8 @@ class LyricScraper:
         :return: dictionary of chart info
         """
         master_dict = {}
+        artist_id_list = []
+        sub_artist_id_list = []
         chart_dict = self.BB.get_chart(chart_name=chart, date_str=date)
         if "Error" in chart_dict.keys():
             print({"Bad Billboard Chart": chart_dict["Error"]})
@@ -159,11 +164,31 @@ class LyricScraper:
                 self.unique_songs += 1
                 master_dict[master_key] = song_dict
 
+                # Keep track of spotify artist id for batch processing:
+                if song_dict["Spotify_Artist_ID"] != "Not Found":
+                    sub_artist_id_list.append(song_dict["Spotify_Artist_ID"])
+                    if len(sub_artist_id_list) > 45:
+                        artist_id_list.append(sub_artist_id_list)
+
             # Finished Message so we know there's progress
             print(self._progress_message(status, chart, date_str,
                                          val, self.records_processed))
             self.records_processed += 1
 
+        # Append Spotify Artist info in batch
+        if sub_artist_id_list != []:
+            artist_id_list.append(sub_artist_id_list)
+
+        ss_artist_info = {}
+        for id_list in artist_id_list:
+            ss_artist_info.update(
+                self.SS.get_artist_info_list(id_list))
+
+        for key, val in master_dict.items():
+            if val["Spotify_Artist_ID"] != "Not Found":
+                master_dict[key].update(ss_artist_info[val["Spotify_Artist_ID"]])
+
+        # Log data:
         if self.use_es:
             self._put_data_in_es(master_dict)
         else:
