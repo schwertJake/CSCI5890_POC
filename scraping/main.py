@@ -160,6 +160,9 @@ class LyricScraper:
                     master_key)) or not self.use_es:
 
                 song_dict = self._get_song_data(val, True)
+                if song_dict["Genius_Lyrics"] == "" and song_dict["AZ_Lyrics"] == "" \
+                    and song_dict["Wikia_Lyrics"] == "" and song_dict["MetroLyrics"] == "":
+                    continue
                 status = "New Entry"
                 self.unique_songs += 1
                 master_dict[master_key] = song_dict
